@@ -1,67 +1,80 @@
+import { useState } from "react";
+import { askAI } from "../services/gemini";
+
 function Roadmaps({ profile }) {
-  const goal = profile.careerGoal.toLowerCase();
+  const [roadmap, setRoadmap] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  let roadmap = [];
+  async function generateRoadmap() {
+    setLoading(true);
 
-  if (goal.includes("frontend")) {
-    roadmap = [
-      "Learn HTML",
-      "Learn CSS",
-      "Learn JavaScript",
-      "Learn React",
-      "Build Projects",
-      "Create Portfolio",
-      "Apply for Jobs",
-    ];
-  } else if (
-    goal.includes("full stack") ||
-    goal.includes("fullstack")
-  ) {
-    roadmap = [
-      "HTML & CSS",
-      "JavaScript",
-      "React",
-      "Node.js",
-      "MongoDB",
-      "Build Full Stack Projects",
-      "Apply for Jobs",
-    ];
-  } else if (
-    goal.includes("data")
-  ) {
-    roadmap = [
-      "Learn Python",
-      "Statistics",
-      "Pandas",
-      "SQL",
-      "Data Visualization",
-      "Machine Learning Basics",
-      "Build Projects",
-    ];
-  } else {
-    roadmap = [
-      "Complete Profile",
-      "Choose Career Goal",
-      "Get Recommendations",
-    ];
+    const response = await askAI(
+      `Create a complete career roadmap for:
+
+Career Goal: ${profile.careerGoal}
+
+Return in this format:
+
+🎯 Career Overview
+
+📚 Phase 1
+
+📚 Phase 2
+
+📚 Phase 3
+
+🛠 Skills Required
+
+📜 Certifications
+
+💼 Job Roles
+
+💰 Expected Salary in India
+
+⏳ Estimated Learning Time
+
+Keep it practical and beginner friendly.`,
+      profile
+    );
+
+    setRoadmap(response);
+    setLoading(false);
   }
 
   return (
-    <div className="bg-zinc-900 p-6 rounded-2xl">
-      <h2 className="text-2xl font-bold mb-6">
-        Career Roadmap
+    <div className="bg-zinc-900 p-6 rounded-3xl">
+
+      <h2 className="text-3xl font-bold mb-6">
+        🛣 AI Career Roadmap
       </h2>
 
-      <div className="space-y-3">
-        {roadmap.map((step, index) => (
-          <div
-            key={index}
-            className="bg-zinc-800 p-4 rounded-xl"
-          >
-            Step {index + 1}: {step}
-          </div>
-        ))}
-      </div>
+      <p className="mb-5 text-zinc-400">
+        Career Goal:
+        <span className="text-white font-semibold">
+          {" "}
+          {profile.careerGoal || "Not Selected"}
+        </span>
+      </p>
+
+      <button
+        onClick={generateRoadmap}
+        className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-semibold"
+      >
+        Generate AI Roadmap
+      </button>
+
+      {loading && (
+        <p className="mt-5 animate-pulse">
+          🤖 Generating Roadmap...
+        </p>
+      )}
+
+      {roadmap && (
+        <div className="mt-6 bg-zinc-800 p-5 rounded-2xl whitespace-pre-wrap">
+          {roadmap}
+        </div>
+      )}
+
     </div>
   );
 }
